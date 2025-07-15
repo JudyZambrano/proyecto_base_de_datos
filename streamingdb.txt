@@ -1,0 +1,259 @@
+-- Crear la base de datos
+CREATE DATABASE plataforma_streaming;
+
+-- Conectarse a la base de datos
+\c plataforma_streaming;
+
+-- Tabla de usuarios
+CREATE TABLE usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    correo TEXT UNIQUE NOT NULL,
+    fecha_registro DATE DEFAULT CURRENT_DATE,
+    pais TEXT,
+    edad INT,
+    suscripcion_activa BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla de artistas
+CREATE TABLE artista (
+    id_artista SERIAL PRIMARY KEY,
+    nombre_artista TEXT NOT NULL,
+    pais_artista TEXT,
+    anio_debut INT
+);
+
+-- Tabla de álbumes
+CREATE TABLE album (
+    id_album SERIAL PRIMARY KEY,
+    titulo_album TEXT NOT NULL,
+    anio_album INT,
+    id_artista INT REFERENCES artista(id_artista)
+);
+
+-- Tabla de canciones
+CREATE TABLE cancion (
+    id_cancion SERIAL PRIMARY KEY,
+    titulo_cancion TEXT NOT NULL,
+    duracion TIME,
+    genero_cancion TEXT,
+    id_artista INT REFERENCES artista(id_artista),
+    id_album INT REFERENCES album(id_album)
+);
+
+-- Tabla de playlists
+CREATE TABLE playlist (
+    id_playlist SERIAL PRIMARY KEY,
+    nombre_playlist TEXT NOT NULL,
+    descripcion TEXT,
+    id_usuario INT REFERENCES usuario(id_usuario)
+);
+
+-- Tabla intermedia para canciones en playlists
+CREATE TABLE playlist_cancion (
+    id_playlist INT REFERENCES playlist(id_playlist) ON DELETE CASCADE,
+    id_cancion INT REFERENCES cancion(id_cancion) ON DELETE CASCADE,
+    orden INT,
+    PRIMARY KEY (id_playlist, id_cancion)
+);
+
+-- Tabla de historial de reproducciones
+CREATE TABLE reproduccion (
+    id_reproduccion SERIAL PRIMARY KEY,
+    id_usuario INT REFERENCES usuario(id_usuario),
+    id_cancion INT REFERENCES cancion(id_cancion),
+    fecha_reproduccion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dispositivo TEXT,
+    ubicacion TEXT
+);
+
+
+
+
+
+-- Inserciones en tabla usuario
+INSERT INTO usuario (nombre, correo, fecha_registro, pais, edad, suscripcion_activa) VALUES
+('Carlos Mendoza', 'carlos1@mail.com', '2024-01-10', 'México', 28, TRUE),
+('Ana Gómez', 'ana2@mail.com', '2023-12-05', 'Argentina', 34, TRUE),
+('Luis Fernández', 'luis3@mail.com', '2024-02-20', 'España', 22, FALSE),
+('María Ruiz', 'maria4@mail.com', '2024-01-25', 'Colombia', 30, TRUE),
+('Sofía Martínez', 'sofia5@mail.com', '2024-03-01', 'Chile', 25, TRUE),
+('Jorge Castillo', 'jorge6@mail.com', '2023-11-15', 'Perú', 40, FALSE),
+('Elena Sánchez', 'elena7@mail.com', '2024-01-12', 'Venezuela', 29, TRUE),
+('Andrés López', 'andres8@mail.com', '2024-03-22', 'Ecuador', 33, TRUE),
+('Julieta Ramírez', 'julieta9@mail.com', '2024-04-04', 'Uruguay', 26, TRUE),
+('Gabriel Torres', 'gabriel10@mail.com', '2024-02-14', 'México', 35, FALSE),
+('Clara Peña', 'clara11@mail.com', '2024-05-10', 'Chile', 31, TRUE),
+('Eduardo Silva', 'eduardo12@mail.com', '2024-01-30', 'Perú', 27, TRUE),
+('Natalia Ortega', 'natalia13@mail.com', '2024-06-01', 'España', 29, TRUE),
+('Martín Ayala', 'martin14@mail.com', '2024-03-19', 'Argentina', 24, FALSE),
+('Laura Romero', 'laura15@mail.com', '2024-02-07', 'Colombia', 30, TRUE),
+('Raúl Vargas', 'raul16@mail.com', '2023-12-28', 'Bolivia', 32, TRUE),
+('Valentina Díaz', 'valentina17@mail.com', '2024-01-15', 'México', 21, TRUE),
+('Javier León', 'javier18@mail.com', '2024-05-25', 'Chile', 28, FALSE),
+('Camila Torres', 'camila19@mail.com', '2024-04-18', 'Paraguay', 34, TRUE),
+('Santiago Cruz', 'santiago20@mail.com', '2024-03-27', 'Uruguay', 22, TRUE),
+('Marina Castro', 'marina21@mail.com', '2024-02-11', 'Ecuador', 27, TRUE),
+('Diego Navarro', 'diego22@mail.com', '2024-04-07', 'Venezuela', 36, FALSE),
+('Isabel Reyes', 'isabel23@mail.com', '2024-01-08', 'Panamá', 31, TRUE),
+('Tomás Guzmán', 'tomas24@mail.com', '2024-06-05', 'Honduras', 30, TRUE),
+('Lucía Morales', 'lucia25@mail.com', '2024-05-13', 'Guatemala', 23, TRUE);
+
+
+-- Inserciones en tabla artista
+INSERT INTO artista (nombre_artista, pais_artista, anio_debut) VALUES
+('Coldplay', 'Reino Unido', 1996),
+('Dua Lipa', 'Reino Unido', 2015),
+('The Weeknd', 'Canadá', 2010),
+('Shakira', 'Colombia', 1990),
+('Bad Bunny', 'Puerto Rico', 2016),
+('Adele', 'Reino Unido', 2006),
+('Luis Miguel', 'México', 1981),
+('Taylor Swift', 'Estados Unidos', 2006),
+('Karol G', 'Colombia', 2013),
+('Rauw Alejandro', 'Puerto Rico', 2014),
+('Billie Eilish', 'Estados Unidos', 2016),
+('Maluma', 'Colombia', 2010),
+('Feid', 'Colombia', 2014),
+('Morat', 'Colombia', 2015),
+('Sebastián Yatra', 'Colombia', 2013),
+('Camilo', 'Colombia', 2010),
+('Ozuna', 'Puerto Rico', 2014),
+('Rosalía', 'España', 2017),
+('Harry Styles', 'Reino Unido', 2010),
+('BTS', 'Corea del Sur', 2013),
+('J Balvin', 'Colombia', 2009),
+('CNCO', 'Estados Unidos', 2015),
+('Becky G', 'Estados Unidos', 2011),
+('Reik', 'México', 2003),
+('Maná', 'México', 1986);
+
+
+-- Inserciones en tabla album
+INSERT INTO album (titulo_album, anio_album, id_artista) VALUES
+('Parachutes', 2000, 1),
+('Future Nostalgia', 2020, 2),
+('After Hours', 2020, 3),
+('Laundry Service', 2001, 4),
+('YHLQMDLG', 2020, 5),
+('25', 2015, 6),
+('Romance', 2017, 7),
+('1989', 2014, 8),
+('KG0516', 2021, 9),
+('Saturno', 2022, 10),
+('Happier Than Ever', 2021, 11),
+('Papi Juancho', 2020, 12),
+('Inter Shibuya', 2021, 13),
+('Balas Perdidas', 2018, 14),
+('Fantasía', 2019, 15),
+('Por Primera Vez', 2020, 16),
+('ENOC', 2020, 17),
+('Motomami', 2022, 18),
+('Harry’s House', 2022, 19),
+('BE', 2020, 20),
+('Colores', 2020, 21),
+('Primera Cita', 2016, 22),
+('Mala Santa', 2019, 23),
+('Des/Amor', 2016, 24),
+('Drama y Luz', 2011, 25);
+
+
+-- Inserciones en tabla cancion
+INSERT INTO cancion (titulo_cancion, duracion, genero_cancion, id_artista, id_album) VALUES
+('Yellow', '00:04:29', 'Rock', 1, 1),
+('Don''t Start Now', '00:03:03', 'Pop', 2, 2),
+('Blinding Lights', '00:03:20', 'R&B', 3, 3),
+('Whenever, Wherever', '00:03:17', 'Pop Latino', 4, 4),
+('Safaera', '00:05:13', 'Reggaeton', 5, 5),
+('Hello', '00:04:55', 'Soul', 6, 6),
+('La Fiesta del Mariachi', '00:03:35', 'Pop', 7, 7),
+('Shake It Off', '00:03:39', 'Pop', 8, 8),
+('Bichota', '00:02:57', 'Reggaeton', 9, 9),
+('Todo de Ti', '00:03:12', 'Urbano', 10, 10),
+('Happier Than Ever', '00:04:58', 'Alternative', 11, 11),
+('Hawái', '00:03:23', 'Reggaeton', 12, 12),
+('Feliz Cumpleaños Ferxxo', '00:03:04', 'Trap', 13, 13),
+('Besos en Guerra', '00:03:46', 'Pop', 14, 14),
+('Cristina', '00:03:31', 'Pop', 15, 15),
+('Tutu', '00:03:16', 'Pop', 16, 16),
+('Caramelo', '00:03:40', 'Reggaeton', 17, 17),
+('Saoko', '00:02:17', 'Experimental', 18, 18),
+('As It Was', '00:02:47', 'Pop Rock', 19, 19),
+('Life Goes On', '00:03:27', 'K-pop', 20, 20),
+('Rojo', '00:03:40', 'Reggaeton', 21, 21),
+('Reggaetón Lento', '00:03:43', 'Latino', 22, 22),
+('Mayores', '00:03:23', 'Reggaeton', 23, 23),
+('Ya Me Enteré', '00:03:39', 'Pop', 24, 24),
+('Labios Compartidos', '00:04:24', 'Rock Latino', 25, 25);
+
+
+-- Inserciones en tabla playlist
+INSERT INTO playlist (nombre_playlist, descripcion, id_usuario) VALUES
+('Favoritas de Carlos', 'Canciones favoritas de Carlos', 1),
+('Workout Hits', 'Música para entrenar', 2),
+('Chill Vibes', 'Música relajante', 3),
+('Latin Party', 'Lo mejor de la música latina', 4),
+('Pop Essentials', 'Hits de pop', 5),
+('Road Trip', 'Música para viajes largos', 6),
+('Romantic Songs', 'Canciones para enamorados', 7),
+('Top 40', 'Las canciones más populares', 8),
+('Indie Love', 'Indie romántico', 9),
+('Retro Vibes', 'Lo mejor de los 80s y 90s', 10),
+('Estudio Focus', 'Para estudiar concentrado', 11),
+('Power Pop', 'Pop con energía', 12),
+('Tranquilidad', 'Canciones calmadas', 13),
+('Mood Latino', 'Ritmos calientes', 14),
+('Hits del Año', 'Top del año actual', 15),
+('Viaje Musical', 'Música para carretera', 16),
+('Amanecer Acústico', 'Suave y acústico', 17),
+('Reggaeton Fever', 'Todo el perreo', 18),
+('Rock Alternativo', 'Guitarras encendidas', 19),
+('Soul & Jazz', 'Para el alma', 20),
+('Bachata Mix', 'Lo mejor de la bachata', 21),
+('Electro Beat', 'Electronic hits', 22),
+('Pop Urbano', 'Pop con sabor urbano', 23),
+('Vallenato Gold', 'Clásicos y modernos', 24),
+('Instrumental Zen', 'Relajación total', 25);
+
+
+-- Inserciones en tabla playlist_cancion (relación y orden)
+INSERT INTO playlist_cancion (id_playlist, id_cancion, orden) VALUES
+(1, 1, 1), (1, 2, 2), (1, 3, 3),
+(2, 5, 1), (2, 10, 2), (2, 20, 3),
+(3, 6, 1), (3, 17, 2), (3, 18, 3),
+(4, 4, 1), (4, 9, 2), (4, 14, 3),
+(5, 2, 1), (5, 8, 2), (5, 19, 3),
+(6, 1, 1), (6, 24, 2), (6, 25, 3),
+(7, 15, 1), (7, 13, 2), (7, 16, 3),
+(8, 3, 1), (8, 10, 2), (8, 11, 3),
+(9, 6, 1), (9, 21, 2);
+
+
+-- Inserciones en tabla reproduccion (historial)
+INSERT INTO reproduccion (id_usuario, id_cancion, dispositivo, ubicacion) VALUES
+(1, 1, 'Móvil', 'Ciudad de México'),
+(2, 2, 'Computadora', 'Buenos Aires'),
+(3, 3, 'Tablet', 'Madrid'),
+(4, 4, 'Móvil', 'Bogotá'),
+(5, 5, 'Computadora', 'Santiago'),
+(6, 6, 'Móvil', 'Lima'),
+(7, 7, 'Computadora', 'Guadalajara'),
+(8, 8, 'Móvil', 'Quito'),
+(9, 9, 'Tablet', 'Montevideo'),
+(10, 10, 'Móvil', 'CDMX'),
+(11, 11, 'Tablet', 'Arequipa'),
+(12, 12, 'Computadora', 'La Paz'),
+(13, 13, 'Móvil', 'Cali'),
+(14, 14, 'Computadora', 'Managua'),
+(15, 15, 'Móvil', 'Medellín'),
+(16, 16, 'Computadora', 'San José'),
+(17, 17, 'Tablet', 'Santa Cruz'),
+(18, 18, 'Móvil', 'Caracas'),
+(19, 19, 'Computadora', 'Valencia'),
+(20, 20, 'Tablet', 'Seúl'),
+(21, 21, 'Móvil', 'San Juan'),
+(22, 22, 'Computadora', 'Tegucigalpa'),
+(23, 23, 'Tablet', 'Ciudad de Panamá'),
+(24, 24, 'Móvil', 'Toluca'),
+(25, 25, 'Computadora', 'Cancún');
+
